@@ -1,0 +1,69 @@
+import bpy
+import random
+import math
+import os
+
+amountOfObjects = int(50)
+fileName = 'Shell #'
+folderPath = '/Users/ruben/Desktop/shell'
+
+def rotate_Empty():
+    bpy.data.objects['Empty.001'].rotation_euler[0] = math.radians(random.randint(1,360))
+    bpy.data.objects['Empty.001'].rotation_euler[1] = math.radians(random.randint(1,360))
+    bpy.data.objects['Empty.001'].rotation_euler[2] = math.radians(random.randint(1,360))
+    
+
+
+
+def random_Torus():
+    bpy.data.objects['Torus'].rotation_euler[0] = math.radians(random.randint(1,360))
+    bpy.data.objects['Torus'].rotation_euler[1] = math.radians(random.randint(1,360))
+    
+    
+    c = random.randint(1,25)
+    if 15 > c:
+     bpy.data.objects['Torus'].modifiers["Remesh"].mode = 'VOXEL'
+     bpy.data.objects['Torus'].modifiers["Remesh"].octree_depth = random.uniform(0.01,0.18)
+    
+    elif 20 > c and c > 15:
+     bpy.data.objects['Torus'].modifiers["Remesh"].mode = 'BLOCKS'
+     bpy.data.objects['Torus'].modifiers["Remesh"].octree_depth = random.randint(4,5)
+
+
+    elif 25 > c and c > 20:
+     bpy.data.objects['Torus'].modifiers["Remesh"].mode = 'SMOOTH'
+     bpy.data.objects['Torus'].modifiers["Remesh"].octree_depth = random.randint(4,6)
+
+
+
+
+
+    
+
+
+
+def rotate_and_render():
+  
+  for step in range(0, amountOfObjects):
+    bpy.context.scene.render.filepath = os.path.join(folderPath,fileName+str(step) +'.png')
+    bpy.ops.render.render(write_still = True)
+    rotate_Empty()
+    random_Torus()
+    bpy.data.objects['Torus'].modifiers["VertexWeightProximity"].max_dist = random.uniform(1.5,11)
+    
+    bpy.ops.object.origin_set(type='ORIGIN_CENTER_OF_MASS', center='MEDIAN')
+    
+
+
+    textMat_list = [m for m in bpy.data.materials if m.name.startswith('BackgroundMaterial')]
+    obj1 = bpy.data.objects['Plane']
+    textColor = random.choice(textMat_list)
+    obj1.active_material = textColor
+    
+    textMat_list = [m for m in bpy.data.materials if m.name.startswith('Material.Torus')]
+    obj = bpy.data.objects['Torus']
+    textColor = random.choice(textMat_list)
+    obj.active_material = textColor
+    
+rotate_and_render()
+
